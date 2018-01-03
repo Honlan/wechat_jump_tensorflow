@@ -94,46 +94,41 @@ def process_boxes(boxes):
     return boxes
 
 # 获取物体识别结果
-def get_positions(chess_x, boxes, classes, scores, category_index):
-    cp = [1, chess_x, 1, chess_x]
+def get_positions(boxes, classes, scores, category_index):
+    cp = [1, 1, 1, 1]
     tp = [1, 1, 1, 1]
     target_type = ''
     min_score_thresh = .5
-    count = 0
 
     for i in range(boxes.shape[0]):
         if scores[i] > min_score_thresh:
             if boxes[i][0] < 0.3 or boxes[i][2] > 0.8:
                 continue
-            count += 1
             if category_index[classes[i]]['name'] == 'chess':
                 cp = boxes[i]
             elif boxes[i][0] < tp[0]:
                 tp = boxes[i]
                 target_type = category_index[classes[i]]['name']
-    print(count)
+
     return cp, tp, target_type
 
+# 一些变量
 loop = 1
 alpha = 1800
-chess_x = 0.311
-chess_x_prev = 0
+chess_x = 0
 target_x = 0
 distance = 0
-WIDTH = 0
-HEIGHT = 0
-bx1, by1, bx2, by2 = 0, 0, 0, 0
 screenshot = 'screenshot.png'
 
 # 根据x距离跳跃
-def jump(distance, target_type, alpha):
+def jump(distance, target_type, alpha, bx1, by1, bx2, by2):
     press_time = max(int(distance * alpha), 200)
 
     cmd = 'adb shell input swipe {} {} {} {} {}'.format(bx1, by1, bx2, by2, press_time)
     os.system(cmd)
 
     if target_type in ['waste', 'magic', 'shop', 'music']:
-        print('=' * 5, target_type , '=' * 5)
+        print('=' * 10, target_type , '=' * 10)
 
 with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
@@ -163,20 +158,24 @@ with detection_graph.as_default():
             vis_util.visualize_boxes_and_labels_on_image_array(image_np, boxes, classes, scores, category_index, use_normalized_coordinates=True, line_thickness=8)
             cv2.imwrite('detection.png', cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR))
 
-            cp, tp, target_type = get_positions(chess_x, boxes, classes, scores, category_index)
+            # 计算棋子和目标块位置
+            cp, tp, target_type = get_positions(boxes, classes, scores, category_index)
             chess_x = (cp[1] + cp[3]) / 2
             target_x = (tp[1] + tp[3]) / 2
-            
-            # if loop > 1:
-                # alpha *= distance / np.abs(chess_x - chess_x_prev)
-
             distance = np.abs(chess_x - target_x)
 
-            print(distance, target_type, alpha, chess_x, target_x)
-            jump(distance, target_type, alpha)
+            # 跳！
+            jump(distance, target_type, alpha, bx1, by1, bx2, by2)
+            print(distance, target_type, alpha)
 
-            chess_x_prev = chess_x
-            chess_x = target_x
+            # 等棋子落稳
             loop += 1
+            time.sleep(np.random.rand() + 1)
 
-            time.sleep(1)
+            # 跳累了休息一会
+            rest_jump = np.random.rand() * 50 + 50
+            rest_time = np.random.rand() * 5 + 5
+            if loop > rest_jump:
+                loop = 1
+                print('已经跳了 %d 下，休息 %d 秒' % (rest_jump, rest_time))
+                time.sleep(rest_time)
