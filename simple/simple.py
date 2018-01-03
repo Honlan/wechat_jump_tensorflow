@@ -42,33 +42,28 @@ while True:
 	alpha = WIDTH * 1.6667
 
 	# 获取棋子x坐标
-	stat = {}
-	longest = 0
+        linemax = []
 	for i in range(int(HEIGHT * 0.4), int(HEIGHT * 0.6)):
-		flag = False
 		line = []
-		for j in range(int(WIDTH * 0.2), int(WIDTH * 0.8)):
+		for j in range(int(WIDTH * 0.15), int(WIDTH * 0.85)):
 			if image_np[i, j, 0] > 40 and image_np[i, j, 0] < 70 and image_np[i, j, 1] > 40 and image_np[i, j, 1] < 70 and image_np[i, j, 2] > 60 and image_np[i, j, 2] < 110:
-				flag = True
 				gray[i, j] = 255
 				if len(line) > 0 and j - line[-1] > 1:
-					flag = False
 					break
 				else:
 					line.append(j)
-		if flag:
-			stat[np.mean(line)] = stat.get(np.mean(line), 0) + 1
-			if len(line) > longest:
-				longest = len(line)
-	stat = sorted(stat.items(), key=lambda x:x[1], reverse=True)
-	chess_x = int(stat[0][0])
+
+                if len(line) > 5 and len(line) > len(linemax):
+			linemax = line
+
+	chess_x = int(np.mean(linemax))
 
 	# 获取目标x坐标
 	for i in range(int(HEIGHT * 0.3), int(HEIGHT * 0.5)):
 		flag = False
 		for j in range(WIDTH):
 			# 超过朋友时棋子上方的图案
-			if np.abs(j - chess_x) < longest:
+			if np.abs(j - chess_x) < len(linemax):
 				continue
 			if not gray[i, j] == 0:
 				target_x = j
