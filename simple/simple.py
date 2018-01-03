@@ -26,6 +26,15 @@ bx1, by1, bx2, by2 = 0, 0, 0, 0
 chess_x = 0
 target_x = 0
 
+fix=1.6667
+size_str = os.popen('adb shell wm size').read()
+if size_str:
+	m = re.search(r'(\d+)x(\d+)', size_str)
+	if m:
+		hxw = "{height}x{width}".format(height=m.group(2), width=m.group(1))
+		if hxw == "960x540":
+			fix = 3.16
+
 while True:
 	pull_screenshot(screenshot)
 	image_np = cv2.imread(screenshot)
@@ -39,7 +48,7 @@ while True:
 	bx2 = WIDTH / 2
 	by1 = HEIGHT * 0.785
 	by2 = HEIGHT * 0.785
-	alpha = WIDTH * 1.6667
+	alpha = WIDTH * fix
 
 	# 获取棋子x坐标
 	stat = {}
