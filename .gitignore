@@ -1,5 +1,5 @@
 .DS_Store
-./simple/screenshot.png
-./simple/detection.png
-./tensorflow/screenshot.png
-./tensorflow/detection.png
+simple/screenshot.png
+simple/detection.png
+tensorflow/screenshot.png
+tensorflow/detection.png

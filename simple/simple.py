@@ -4,21 +4,19 @@ import numpy as np
 import cv2
 import os
 import time
+import re
 
 # 屏幕截图
 def pull_screenshot(path):
-    os.system('adb shell screencap -p /sdcard/%s' % path)
-    os.system('adb pull /sdcard/%s .' % path)
+	os.system('adb shell screencap -p /sdcard/%s' % path)
+	os.system('adb pull /sdcard/%s .' % path)
 
 # 根据x距离跳跃
 def jump(distance, alpha):
-    press_time = max(int(distance * alpha), 200)
+	press_time = max(int(distance * alpha), 200)
 
-    cmd = 'adb shell input swipe {} {} {} {} {}'.format(bx1, by1, bx2, by2, press_time)
-    os.system(cmd)
-
-if not os.path.exists('backup'):
-	os.mkdir('backup')
+	cmd = 'adb shell input swipe {} {} {} {} {}'.format(bx1, by1, bx2, by2, press_time)
+	os.system(cmd)
 
 screenshot = 'screenshot.png'
 alpha = 0
@@ -26,7 +24,8 @@ bx1, by1, bx2, by2 = 0, 0, 0, 0
 chess_x = 0
 target_x = 0
 
-fix=1.6667
+fix = 1.6667
+# 检查分辨率是否是960x540
 size_str = os.popen('adb shell wm size').read()
 if size_str:
 	m = re.search(r'(\d+)x(\d+)', size_str)
@@ -51,7 +50,7 @@ while True:
 	alpha = WIDTH * fix
 
 	# 获取棋子x坐标
-        linemax = []
+	linemax = []
 	for i in range(int(HEIGHT * 0.4), int(HEIGHT * 0.6)):
 		line = []
 		for j in range(int(WIDTH * 0.15), int(WIDTH * 0.85)):
@@ -62,8 +61,10 @@ while True:
 				else:
 					line.append(j)
 
-                if len(line) > 5 and len(line) > len(linemax):
+		if len(line) > 5 and len(line) > len(linemax):
 			linemax = line
+		if len(linemax) > 20 and len(line) == 0:
+			break
 
 	chess_x = int(np.mean(linemax))
 
@@ -84,8 +85,8 @@ while True:
 	# 修改检测图
 	gray[:, chess_x] = 255
 	gray[:, target_x] = 255
-	# 备份检测图
-	# cv2.imwrite('backup/%d.png' % int(time.time()), gray)
+	# 保存检测图
+	cv2.imwrite('detection.png', gray)
 
 	print(chess_x, target_x)
 	jump(float(np.abs(chess_x - target_x)) / WIDTH, alpha)
