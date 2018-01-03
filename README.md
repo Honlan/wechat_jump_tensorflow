@@ -3,7 +3,7 @@
 ### 所需环境
 
 - `Python3.6`、`OpenCV`、`TensorFlow`等
-- `adb`，参考[https://github.com/wangshub/wechat_jump_game](https://github.com/wangshub/wechat_jump_game)
+- `adb`
 
 ### 文件介绍
 
