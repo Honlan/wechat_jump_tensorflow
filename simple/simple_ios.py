@@ -21,13 +21,13 @@ screenshot = 'jump_ios.png'
 
 # 屏幕截图
 def pull_screenshot():
-    c.screenshot(screenshot)
+	c.screenshot(screenshot)
 
 # 根据x距离跳跃
 def jump(distance, alpha):
-    press_time = max(int(distance * alpha), 200) / 1000.0
-    print('press time: {}'.format(press_time))
-    s.tap_hold(200, 200, press_time)
+	press_time = max(int(distance * alpha), 200) / 1000.0
+	print('press time: {}'.format(press_time))
+	s.tap_hold(200, 200, press_time)
 
 alpha = 0
 bx1, by1, bx2, by2 = 0, 0, 0, 0
@@ -87,7 +87,7 @@ while True:
 	gray[:, chess_x] = 255
 	gray[:, target_x] = 255
 	# 保存检测图
-	cv2.imwrite('backup/%d.png' % int(time.time()), gray)
+	cv2.imwrite('detection.png', gray)
 
 	print(chess_x, target_x)
 	jump(float(np.abs(chess_x - target_x)) / WIDTH, alpha)
