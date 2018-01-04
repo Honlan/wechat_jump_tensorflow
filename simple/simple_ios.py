@@ -87,7 +87,7 @@ while True:
 	gray[:, chess_x] = 255
 	gray[:, target_x] = 255
 	# 保存检测图
-	cv2.imwrite('detection.png', gray)
+	cv2.imwrite('detection_ios.png', gray)
 
 	print(chess_x, target_x)
 	jump(float(np.abs(chess_x - target_x)) / WIDTH, alpha)
