@@ -1,8 +1,14 @@
 # 深度学习 - 微信跳一跳
 
+### 2018.01.05更新
+
+标注数据增加到1200张图片，并且用更准的`faster_rcnn_inception_v2_coco`模型重新训练了一遍
+
 ### 项目介绍
 
-参考知乎文章：[https://zhuanlan.zhihu.com/p/32553763](https://zhuanlan.zhihu.com/p/32553763)
+知乎文章：[https://zhuanlan.zhihu.com/p/32553763](https://zhuanlan.zhihu.com/p/32553763)
+
+感谢[Chao](https://github.com/loveu520)、[奋逗逗](https://github.com/liuzhenhui)对于标注数据做出的贡献
 
 ### 所需环境
 
@@ -11,15 +17,15 @@
 
 ### 文件介绍
 
-`simple`目录中的`simple.py`使用`OpenCV2`检测棋子和目标块的位置，简单粗暴
+`simple`目录中的`simple.py`使用`OpenCV2`检测棋子和目标块的位置，简单粗暴，`simple_ios.py`是对应的IOS版本
 
 ![simple检测结果](imgs/simple检测结果.gif)
  
 `tensorflow`目录包括以下文件：
 
-- `retrain`：其中包含了物体检测模型的配置文件，以及物体类别映射文件；
+- `wechat_jump_label_map.pbtxt`：物体类别映射文件；
 - `utils`：提供辅助功能的文件；
-- `wechat_jump_inference_graph`：训练好的物体检测模型；
+- `frozen_inference_graph_frcnn_inception_v2_coco.pb`：训练好的物体检测模型，共1200张标注数据，使用`faster_rcnn_inception_v2_coco`训练；
 - `wechat_auto_jump.py`：自动跳一跳的代码
 
 ![物体检测结果](imgs/物体检测结果.gif)

@@ -12,8 +12,8 @@ if tf.__version__ != '1.4.0':
     raise ImportError('Please upgrade your tensorflow installation to v1.4.0!')
 
 # 模型配置
-PATH_TO_CKPT = 'wechat_jump_inference_graph/frozen_inference_graph.pb'
-PATH_TO_LABELS = 'retrain/wechat_jump_label_map.pbtxt'
+PATH_TO_CKPT = 'frozen_inference_graph_frcnn_inception_v2_coco.pb'
+PATH_TO_LABELS = 'wechat_jump_label_map.pbtxt'
 NUM_CLASSES = 7
 
 # 加载模型
@@ -34,64 +34,16 @@ def pull_screenshot(path):
     os.system('adb shell screencap -p /sdcard/%s' % path)
     os.system('adb pull /sdcard/%s .' % path)
 
-# 数据增强
-def data_augmentation(path):
+# 读取图片
+def read_image(path):
     image_np = cv2.imread(path)
     image_np = cv2.cvtColor(image_np, cv2.COLOR_BGR2RGB)
+
     WIDTH = image_np.shape[1]
     HEIGHT = image_np.shape[0]
-    images = np.ones((9,) + image_np.shape) * 255.
+    image_np_expanded = np.expand_dims(image_np, axis=0)
 
-    images[0, :int(0.95 * HEIGHT), :int(0.95 * WIDTH), :] = image_np[int(0.05 * HEIGHT):, int(0.05 * WIDTH):, :]
-    images[1, :int(0.95 * HEIGHT), :, :] = image_np[int(0.05 * HEIGHT):, :, :]
-    images[2, :int(0.95 * HEIGHT), int(0.05 * WIDTH):, :] = image_np[int(0.05 * HEIGHT):, :int(0.95 * WIDTH), :]
-
-    images[3, :, :int(0.95 * WIDTH), :] = image_np[:, int(0.05 * WIDTH):, :]
-    images[4, :, :, :] = image_np[:, :, :]
-    images[5, :, int(0.05 * WIDTH):, :] = image_np[:, :int(0.95 * WIDTH), :]
-
-    images[6, int(0.05 * HEIGHT):, :int(0.95 * WIDTH), :] = image_np[:int(0.95 * HEIGHT), int(0.05 * WIDTH):, :]
-    images[7, int(0.05 * HEIGHT):, :, :] = image_np[:int(0.95 * HEIGHT), :, :]
-    images[8, int(0.05 * HEIGHT):, int(0.05 * WIDTH):, :] = image_np[:int(0.95 * HEIGHT), :int(0.95 * WIDTH), :]
-
-    return image_np, images, WIDTH, HEIGHT
-
-# 还原平移
-def process_boxes(boxes):
-    for i in range(boxes.shape[1]):
-        # ymin, xmin, ymax, xmax
-        boxes[0, i, 0] += 0.05
-        boxes[0, i, 1] += 0.05
-        boxes[0, i, 2] += 0.05
-        boxes[0, i, 3] += 0.05
-
-        boxes[1, i, 0] += 0.05
-        boxes[1, i, 2] += 0.05
-
-        boxes[2, i, 0] += 0.05
-        boxes[2, i, 1] -= 0.05
-        boxes[2, i, 2] += 0.05
-        boxes[2, i, 3] -= 0.05
-
-        boxes[3, i, 1] += 0.05
-        boxes[3, i, 3] += 0.05
-
-        boxes[5, i, 1] -= 0.05
-        boxes[5, i, 3] -= 0.05
-
-        boxes[6, i, 0] -= 0.05
-        boxes[6, i, 1] += 0.05
-        boxes[6, i, 2] -= 0.05
-        boxes[6, i, 3] += 0.05
-
-        boxes[7, i, 0] -= 0.05
-        boxes[7, i, 2] -= 0.05
-
-        boxes[8, i, 0] -= 0.05
-        boxes[8, i, 1] -= 0.05
-        boxes[8, i, 2] -= 0.05
-        boxes[8, i, 3] -= 0.05
-    return boxes
+    return image_np, image_np_expanded, WIDTH, HEIGHT
 
 # 获取物体识别结果
 def get_positions(boxes, classes, scores, category_index):
@@ -139,7 +91,7 @@ with detection_graph.as_default():
         num_detections = detection_graph.get_tensor_by_name('num_detections:0')
         while True:
             pull_screenshot(screenshot)
-            image_np, images, WIDTH, HEIGHT = data_augmentation(screenshot)
+            image_np, image_np_expanded, WIDTH, HEIGHT = read_image(screenshot)
             
             bx1 = WIDTH / 2
             bx2 = WIDTH / 2
@@ -148,8 +100,7 @@ with detection_graph.as_default():
 
             (boxes, scores, classes, num) = sess.run(
                 [detection_boxes, detection_scores, detection_classes, num_detections], 
-                feed_dict={image_tensor: images})
-            boxes = process_boxes(boxes)
+                feed_dict={image_tensor: image_np_expanded})
 
             boxes = np.reshape(boxes, (-1, boxes.shape[-1]))
             scores = np.reshape(scores, (-1))
@@ -166,7 +117,7 @@ with detection_graph.as_default():
 
             # 跳！
             jump(distance, target_type, alpha, bx1, by1, bx2, by2)
-            print(distance, target_type, alpha)
+            print(distance, target_type)
 
             # 等棋子落稳
             loop += 1
