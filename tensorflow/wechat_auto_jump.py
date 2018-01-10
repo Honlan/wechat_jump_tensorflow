@@ -93,10 +93,10 @@ with detection_graph.as_default():
             pull_screenshot(screenshot)
             image_np, image_np_expanded, WIDTH, HEIGHT = read_image(screenshot)
             
-            bx1 = WIDTH / 2 + int(np.random.rand() * 100 - 50)
-            bx2 = WIDTH / 2 + int(np.random.rand() * 100 - 50)
-            by1 = HEIGHT * 0.785 + int(np.random.rand() * 20 - 10)
-            by2 = HEIGHT * 0.785 + int(np.random.rand() * 20 - 10)
+            bx1 = WIDTH / 2 + int(np.random.rand() * 10 - 5)
+            bx2 = WIDTH / 2 + int(np.random.rand() * 10 - 5)
+            by1 = HEIGHT * 0.785 + int(np.random.rand() * 4 - 2)
+            by2 = HEIGHT * 0.785 + int(np.random.rand() * 4 - 2)
 
             (boxes, scores, classes, num) = sess.run(
                 [detection_boxes, detection_scores, detection_classes, num_detections], 

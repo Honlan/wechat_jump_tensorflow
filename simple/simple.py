@@ -43,10 +43,10 @@ while True:
 	HEIGHT = image_np.shape[0]
 	WIDTH = image_np.shape[1]
 
-	bx1 = WIDTH / 2
-	bx2 = WIDTH / 2
-	by1 = HEIGHT * 0.785
-	by2 = HEIGHT * 0.785
+	bx1 = WIDTH / 2 + int(np.random.rand() * 10 - 5)
+	bx2 = WIDTH / 2 + int(np.random.rand() * 10 - 5)
+	by1 = HEIGHT * 0.785 + int(np.random.rand() * 4 - 2)
+	by2 = HEIGHT * 0.785 + int(np.random.rand() * 4 - 2) 
 	alpha = WIDTH * fix
 
 	# 获取棋子x坐标
