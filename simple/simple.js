@@ -26,10 +26,10 @@ do {
     var img = captureScreen();
 
     // 触按位置
-    var bx1 = parseInt(WIDTH / 2 + random(-5, 5)),
-        bx2 = parseInt(WIDTH / 2 + random(-5, 5)),
-        by1 = parseInt(HEIGHT * 0.785 + random(-2, 2)),
-        by2 = parseInt(HEIGHT * 0.785 + random(-2, 2));
+    var bx1 = parseInt(WIDTH / 2 + random(-10, 10)),
+        bx2 = parseInt(WIDTH / 2 + random(-10, 10)),
+        by1 = parseInt(HEIGHT * 0.785 + random(-4, 4)),
+        by2 = parseInt(HEIGHT * 0.785 + random(-4, 4));
 
     // 棋子底部中心找色
     var CHESS_X, CHESS_Y;
